@@ -26,13 +26,13 @@ def create_hints(hints):
     for hint in hints:
         if hint is None:
             continue
-        hint_bundle.append([{
+        hint_bundle.append({
             'Capital': hint[0]['capital'][0],
             'Region': hint[0]['region'],
             'Population': hint[0]['population'],
             'Flag': hint[0]['flag']['png'],
             'Currencies': hint[0]['currencies'][0]['symbol'] + ' - ' + hint[0]['currencies'][0]['code'],
-        }])
+        })
     return hint_bundle
 
 def bundle_hints(countries):

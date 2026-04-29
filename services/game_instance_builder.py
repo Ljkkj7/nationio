@@ -3,8 +3,11 @@ from utils.country_randomiser import random_countries
 
 class GameInstance:
     def __init__(self):
-        self.score = 0
-        self.hints_shown = []
+        self.score = 30
+        self.rounds_played = 0
+        self.hints_shown_this_round = 0
+        self.hints_shown_total = 0
+        self.rounds_completed = 0
         self.countries = []
         self.hints = []
         self.current_hint = 0
@@ -13,9 +16,7 @@ class GameInstance:
         self.countries = random_countries()
         self.hints = bundle_hints(self.countries)
 
-
-if __name__ == '__main__':
-    instance = GameInstance()
-    instance.start()
-    print(instance.countries)
-    print(instance.hints)
+    def init_new_round(self):
+        self.rounds_played += 1
+        self.hints_shown_this_round = 0
+        self.current_hint = 0

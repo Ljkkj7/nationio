@@ -1,10 +1,10 @@
 import asyncio
 import aiohttp
 from aiohttp import ClientSession
-from utils.country_randomiser import random_countries
+
 
 async def fetch_hints(country, session):
-    url = f'https://restcountries.com/v3.1/name/{country}?fullText=true&fields=name,region,capital,population,flags,currencies'
+    url = f'https://restcountries.com/v4/name/{country}?fullText=true&fields=name,region,capital,population,flag,currencies'
     try:
         async with session.get(url) as res:
             if res.status == 200:
@@ -30,13 +30,11 @@ def create_hints(hints):
             'Capital': hint[0]['capital'][0],
             'Region': hint[0]['region'],
             'Population': hint[0]['population'],
-            'Flag': hint[0]['flags']['png'],
-            'Currencies': hint[0]['currencies'],
+            'Flag': hint[0]['flag']['png'],
+            'Currencies': hint[0]['currencies'][0]['symbol'] + ' - ' + hint[0]['currencies'][0]['code'],
         })
     return hint_bundle
 
-if __name__ == '__main__':
-    countries = random_countries()
+def bundle_hints(countries):
     hints = asyncio.run(fetch_all_hints(countries))
-    hint_bundle = create_hints(hints)
-    print(hint_bundle)
+    return create_hints(hints)

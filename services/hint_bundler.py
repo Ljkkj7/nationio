@@ -21,7 +21,22 @@ async def fetch_all_hints(countries):
         
         return await asyncio.gather(*tasks)
 
+def create_hints(hints):
+    hint_bundle = []
+    for hint in hints:
+        if hint is None:
+            continue
+        hint_bundle.append({
+            'Capital': hint[0]['capital'][0],
+            'Region': hint[0]['region'],
+            'Population': hint[0]['population'],
+            'Flag': hint[0]['flags']['png'],
+            'Currencies': hint[0]['currencies'],
+        })
+    return hint_bundle
+
 if __name__ == '__main__':
     countries = random_countries()
     hints = asyncio.run(fetch_all_hints(countries))
-    print(hints)
+    hint_bundle = create_hints(hints)
+    print(hint_bundle)

@@ -1,7 +1,7 @@
 import random
 
 def read_country_names(filename):
-    with open(filename, 'r') as f:
+    with open(filename, 'r', encoding='utf-8' ) as f:
         return f.read().splitlines()
 
 def random_countries():

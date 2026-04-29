@@ -20,4 +20,4 @@ def write_to_file(filename, data):
 
 if __name__ == '__main__':
     data = fetch_all_countries()
-    write_to_file('../countrynames.csv', data)    
+    write_to_file('countrynames.csv', data)    

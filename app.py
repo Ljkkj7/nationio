@@ -1,16 +1,13 @@
 from services.hint_bundler import bundle_hints
 from utils.country_randomiser import random_countries
+from services.game_instance_builder import GameInstance
 
 def game():
-    countries = random_countries()
-    hints = bundle_hints(countries)
-    for i in range(0, 5):
-        print(countries[i])
-        print(hints[i]['Capital'])
-        print(hints[i]['Region'])
-        print(hints[i]['Population'])
-        print(hints[i]['Flag'])
-        print(hints[i]['Currencies'])
+    instance = GameInstance()
+    instance.start()
+    print(instance.countries)
+    print(instance.hints)
+    
 
 if __name__ == '__main__':
     game()    

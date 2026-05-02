@@ -1,7 +1,45 @@
 from services.hint_bundler import bundle_hints
 from utils.country_randomiser import random_countries
 
-class GameInstance:
+class GameInstanceMixin:
+    def show_used_hints(self):
+        print('\nUsed hints: ')
+        print('-----------')
+        for hint in self.shown_hints:
+            print(f'  {hint}')
+        print('-----------')
+
+    def show_game_status(self):
+        print("\nScore: ", self.score)
+        print("Round: ", self.rounds_played)
+        if self.current_hint < len(self.hint_names):
+            print(f"\nCurrent Hint: {self.hint_names[self.current_hint]}: {self.hints[self.rounds_played - 1][self.hint_names[self.current_hint]]}")
+        else:
+            print('No more hints available.')
+    
+    def show_game_menu(self):
+        print("\n1. Reveal next hint")
+        print("2. Guess")
+        print("3. Quit")
+        return input("Enter your choice: ")
+
+    def reset_game(self):
+        self.score = 30
+        self.rounds_played = 0
+        self.hints_shown_this_round = 0
+        self.countries = []
+        self.hints = []
+        self.hint_names = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
+        self.shown_hints = []
+        self.current_hint = 0
+    
+    def new_game(self):
+        if self.rounds_played > 0:
+            self.reset_game()
+        self.start()
+        self.init_new_round()
+
+class GameInstance(GameInstanceMixin):
     def __init__(self):
         self.score = 30
         self.rounds_played = 0
@@ -53,41 +91,3 @@ class GameInstance:
         print(f'Final Score: {self.score}')
         print('\n------------\n')
         return input("Play again? (y/n): ")
-    
-class GameInstanceMixin(GameInstance):
-    def show_used_hints(self):
-        print('\nUsed hints: ')
-        print('-----------')
-        for hint in self.shown_hints:
-            print(f'  {hint}')
-        print('-----------')
-
-    def show_game_status(self):
-        print("\nScore: ", self.score)
-        print("Round: ", self.rounds_played)
-        if self.current_hint < len(self.hint_names):
-            print(f"\nCurrent Hint: {self.hint_names[self.current_hint]}: {self.hints[self.rounds_played - 1][self.hint_names[self.current_hint]]}")
-        else:
-            print('No more hints available.')
-    
-    def show_game_menu(self):
-        print("\n1. Reveal next hint")
-        print("2. Guess")
-        print("3. Quit")
-        return input("Enter your choice: ")
-
-    def reset_game(self):
-        self.score = 30
-        self.rounds_played = 0
-        self.hints_shown_this_round = 0
-        self.countries = []
-        self.hints = []
-        self.hint_names = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
-        self.shown_hints = []
-        self.current_hint = 0
-    
-    def new_game(self):
-        if self.rounds_played > 0:
-            self.reset_game()
-        self.start()
-        self.init_new_round()

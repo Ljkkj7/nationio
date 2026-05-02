@@ -1,34 +1,39 @@
 from services.hint_bundler import bundle_hints
 from utils.country_randomiser import random_countries
-from services.game_instance_builder import GameInstance, GameInstanceMixin
+from services.game_instance_builder import GameInstance
 
-def game():
-    instance = GameInstanceMixin()
+def game(instance):
+
     instance.new_game()
-    while True:
 
-        if instance.rounds_played > len(instance.countries):
-            choice = instance.end_game()
-            if choice.lower() == 'y':
-                instance.new_game()
-                continue
-            elif choice.lower() != 'n':
-                print("\nInvalid choice. Please try again.")
-                continue
-            break
+    while instance.rounds_played - 1 < len(instance.countries):
+        round(instance)
 
-        instance.show_game_status()
-        instance.show_used_hints()
-        choice = instance.show_game_menu()
+    handle_end_game(instance)
 
-        if choice == '1':
-            instance.show_next_hint()
-        elif choice == '2':
-            instance.guess(input("Enter your guess: "))
-        elif choice == '3':
-            return
-        else:
-            print("\nInvalid choice. Please try again.")
+def round(instance):
+    instance.show_game_status()
+    instance.show_used_hints()
+    choice = instance.show_game_menu()
+
+    if choice == '1':
+        instance.show_next_hint()
+    elif choice == '2':
+        instance.guess(input("Enter your guess: "))
+    elif choice == '3':
+        quit()
+    else:
+        print("\nInvalid choice. Please try again.")
+
+def handle_end_game(instance):
+    choice = instance.end_game()
+    if choice.lower() == 'y':
+        game(instance)
+    elif choice.lower() == 'n':
+        return
+    else:
+        print("\nInvalid choice. Please try again.")
+        handle_end_game(instance)
 
 def menu():
     print("1. Play")
@@ -39,7 +44,8 @@ def main():
     menu()
     choice = input("Enter your choice: ")
     if choice == '1':
-        game()
+        instance = GameInstance()
+        game(instance)
     elif choice == '2':
         return
     else:

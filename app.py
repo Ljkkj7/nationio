@@ -4,22 +4,22 @@ from services.game_instance_builder import GameInstance, GameInstanceMixin
 
 def game():
     instance = GameInstanceMixin()
-    instance.start()
-    instance.init_new_round()
+    instance.new_game()
     while True:
 
-        print("\nScore: ", instance.score)
-        print("Round: ", instance.rounds_played)
-        if instance.current_hint < len(instance.hint_names):
-            print(f"\nCurrent Hint: {instance.hint_names[instance.current_hint]}: {instance.hints[instance.rounds_played - 1][instance.hint_names[instance.current_hint]]}")
-        else:
-            print('No more hints available.')
-        instance.show_used_hints()
-        print("\n1. Reveal next hint")
-        print("2. Guess")
-        print("3. Quit")
+        if instance.rounds_played > len(instance.countries):
+            choice = instance.end_game()
+            if choice.lower() == 'y':
+                instance.new_game()
+                continue
+            elif choice.lower() != 'n':
+                print("\nInvalid choice. Please try again.")
+                continue
+            break
 
-        choice = input("Enter your choice: ")
+        instance.show_game_status()
+        instance.show_used_hints()
+        choice = instance.show_game_menu()
 
         if choice == '1':
             instance.show_next_hint()
@@ -28,7 +28,7 @@ def game():
         elif choice == '3':
             return
         else:
-            print("Invalid choice. Please try again.")
+            print("\nInvalid choice. Please try again.")
 
 def menu():
     print("1. Play")

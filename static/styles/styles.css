@@ -1,52 +1,484 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --bg-base: #1a1a1a;
+    --bg-surface: #222222;
+    --bg-card: #2a2a2a;
+    --bg-hover: #313131;
+    --border: #383838;
+    --border-subtle: #2e2e2e;
+
+    --accent: #4db87a;
+    --accent-dark: #3da066;
+    --accent-light: rgba(77, 184, 122, 0.12);
+
+    --text-primary: #f0f0f0;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.55);
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    --transition: 0.18s ease;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
 header {
-    background-color: rgb(255, 255, 255);
-    padding: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    box-shadow: var(--shadow-sm);
 }
 
 .nav-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 60px;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 .title {
-    color: rgb(0, 0, 0);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+    user-select: none;
+}
+
+.title span,
+.title::after {
+    content: '';
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .nav-links {
     display: flex;
     list-style: none;
+    gap: 4px;
 }
 
 .nav-links li {
-    color: rgb(0, 0, 0);
-    margin: 0 10px;
     cursor: pointer;
 }
 
-.nav-links li:hover {
-    transform: scale(1.1);
-    transition: all 0.3s ease;
-}
-
 .nav-links a {
-    color: rgb(0, 0, 0);
+    color: var(--text-secondary);
     text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: color var(--transition), background var(--transition), border-color var(--transition);
+    display: block;
 }
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: rgb(255, 255, 255);
+.nav-links a:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+    border-color: var(--border);
 }
 
 footer {
-    background-color: rgb(255, 255, 255);
-    padding: 10px;
+    margin-top: auto;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
+    padding: 20px 32px;
     text-align: center;
 }
 
 footer p {
-    color: rgb(0, 0, 0);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.container,
+.game-container,
+.end-container {
+    position: relative;
+    max-width: 680px;
+    width: 90%;
+    margin: 56px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: fadeUp 0.35s ease both;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container p {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+button,
+.start-game-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 22px;
+    letter-spacing: 0.2px;
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.start-game-btn,
+form[action="/game/new"] button,
+form[action="/"] button {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
+}
+
+.start-game-btn:hover,
+form[action="/game/new"] button:hover,
+form[action="/"] button:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.start-game-btn:active,
+form[action="/game/new"] button:active,
+form[action="/"] button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+form[action="/game/guess"] button[type="submit"] {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
+}
+
+form[action="/game/guess"] button[type="submit"]:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Next Hint — secondary ghost button */
+form[action="/game/next-hint"] button {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    padding: 9px 22px;
+}
+
+form[action="/game/next-hint"] button:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: #4a4a4a;
+    transform: translateY(-1px);
+}
+
+.game-container>h1 {
+    font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.5;
+    letter-spacing: -0.1px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px 28px;
+    width: 100%;
+    box-shadow: var(--shadow-sm);
+}
+
+.game-container>h1 {
+    border-left: 3px solid var(--accent);
+    padding-left: 24px;
+}
+
+.game-container>img {
+    max-width: 200px;
+    width: 75%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 0.3s ease both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.game-container>p {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 8px 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.shown-hints {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    min-height: 44px;
+}
+
+.shown-hints p {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px 12px;
+    animation: chipIn 0.25s ease both;
+}
+
+@keyframes chipIn {
+    from {
+        opacity: 0;
+        transform: scale(0.88);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.shown-hints img {
+    max-width: 72px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    animation: chipIn 0.25s ease both;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.form-actions form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.guess-input {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    outline: none;
+    width: 240px;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.guess-input::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.guess-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(77, 184, 122, 0.15);
+    background: var(--bg-hover);
+}
+
+.end-container h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+    text-align: center;
+    animation: fadeUp 0.4s ease both;
+}
+
+.end-container>p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 0.2px;
+}
+
+.countries-revealed {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.countries-revealed h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 10px;
+    margin-bottom: 2px;
+}
+
+.countries-revealed p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--bg-hover);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 9px 14px;
+    transition: background var(--transition);
+}
+
+.countries-revealed p:hover {
+    background: #373737;
+}
+
+.countries-revealed p strong {
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    min-width: 22px;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+::selection {
+    background: rgba(77, 184, 122, 0.3);
+    color: #fff;
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: 0 16px;
+    }
+
+    .nav-bar {
+        height: 54px;
+    }
+
+    .title {
+        font-size: 1.1rem;
+    }
+
+    .container,
+    .game-container,
+    .end-container {
+        margin: 32px auto;
+        gap: 16px;
+    }
+
+    .guess-input {
+        width: 175px;
+    }
+
+    .game-container>h1 {
+        font-size: 0.88rem;
+        padding: 16px 16px 16px 18px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
 }

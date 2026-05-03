@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="end-container">
+    <h1>Game Over</h1>
+    <p>Final Score: {{ game_instance.score }}</p>
+    <div class="countries-revealed">
+        <h2>Answers:</h2>
+        {% for country in game_instance.countries %}
+        <p><strong>{{ loop.index }}.</strong> {{ country }}</p>
+        {% endfor %}
+    </div>
+    <div class="form-actions">
+        <form action="/game/new">
+            <button type="submit" class="start-game-btn">Play Again</button>
+        </form>
+        <form action="/">
+            <button type="submit" class="start-game-btn">Back to Home</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

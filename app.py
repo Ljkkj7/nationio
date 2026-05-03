@@ -20,6 +20,9 @@ def game():
         return flask.redirect(flask.url_for('game'))
 
     game_instance = GameInstance.from_dict(data)
+
+    if game_instance.rounds_played > 5:
+        return flask.redirect(flask.url_for('end_game'))
     return flask.render_template('game.html', game_instance=game_instance)
 
 @app.route('/game/next-hint', methods=['POST'])
@@ -45,6 +48,15 @@ def guess():
     game_instance.guess(guess)
     flask.session['game_instance'] = game_instance.to_dict()
     return flask.redirect(flask.url_for('game'))
+
+@app.route('/game/end')
+def end_game():
+    data = flask.session.get('game_instance')
+    if not data:
+        return flask.redirect(flask.url_for('game'))
+
+    game_instance = GameInstance.from_dict(data)
+    return flask.render_template('end.html', game_instance=game_instance)
 
 @app.route('/game/new')
 def new_game():

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="game-container">
+    <h1>
+        Current Hint | {{ game_instance.hint_names[game_instance.current_hint] }}:
+        {{ game_instance.hints[game_instance.rounds_played -1][game_instance.hint_names[game_instance.current_hint]]}}
+    </h1>
+    <div class="shown-hints">
+        {% for hint in game_instance.shown_hints %}
+        <p>{{ hint }}</p>
+        {% endfor %}
+    </div>
+    <p>Score: {{ game_instance.score }} | Round: {{ game_instance.rounds_played }}</p>
+
+    <div class="form-actions">
+        <form action="/game/guess" method="post">
+            <input type="text" name="guess" class="guess-input" placeholder="Guess the country" autocomplete="off"
+                required>
+            <button type="submit">Guess</button>
+        </form>
+
+        <form action="/game/next-hint" method="POST">
+            <button type="submit">Next Hint</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

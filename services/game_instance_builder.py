@@ -91,3 +91,28 @@ class GameInstance(GameInstanceMixin):
         print(f'Final Score: {self.score}')
         print('\n------------\n')
         return input("Play again? (y/n): ")
+
+    def to_dict(self):
+        return {
+            'score': self.score,
+            'rounds_played': self.rounds_played,
+            'hints_shown_this_round': self.hints_shown_this_round,
+            'countries': self.countries,
+            'hints': self.hints,
+            'hint_names': self.hint_names,
+            'shown_hints': self.shown_hints,
+            'current_hint': self.current_hint,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        instance = cls()
+        instance.score = data['score']
+        instance.rounds_played = data['rounds_played']
+        instance.hints_shown_this_round = data['hints_shown_this_round']
+        instance.countries = data['countries']
+        instance.hints = data['hints']
+        instance.hint_names = data['hint_names']
+        instance.shown_hints = data['shown_hints']
+        instance.current_hint = data['current_hint']
+        return instance

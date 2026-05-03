@@ -1,57 +1,60 @@
 from services.hint_bundler import bundle_hints
 from utils.country_randomiser import random_countries
 from services.game_instance_builder import GameInstance
+import flask
+import os
 
-def game(instance):
+secret_key = os.urandom(16).hex()
 
-    instance.new_game()
+app = flask.Flask(__name__)
+app.secret_key = secret_key
 
-    while instance.rounds_played - 1 < len(instance.countries):
-        round(instance)
+@app.route('/')
+def index():
+    return flask.render_template('index.html')
 
-    handle_end_game(instance)
+@app.route('/game')
+def game():
+    data = flask.session.get('game_instance')
+    if not data:
+        return flask.redirect(flask.url_for('game'))
 
-def round(instance):
-    instance.show_game_status()
-    instance.show_used_hints()
-    choice = instance.show_game_menu()
+    game_instance = GameInstance.from_dict(data)
+    return flask.render_template('game.html', game_instance=game_instance)
 
-    if choice == '1':
-        instance.show_next_hint()
-    elif choice == '2':
-        instance.guess(input("Enter your guess: "))
-    elif choice == '3':
-        quit()
-    else:
-        print("\nInvalid choice. Please try again.")
+@app.route('/game/next-hint', methods=['POST'])
+def next_hint():
+    data = flask.session.get('game_instance')
+    if not data:
+        return flask.redirect(flask.url_for('game'))
 
-def handle_end_game(instance):
-    choice = instance.end_game()
-    if choice.lower() == 'y':
-        game(instance)
-    elif choice.lower() == 'n':
-        return
-    else:
-        print("\nInvalid choice. Please try again.")
-        handle_end_game(instance)
+    game_instance = GameInstance.from_dict(data)
+    game_instance.show_next_hint()
 
-def menu():
-    print("1. Play")
-    print("2. Quit")
+    flask.session['game_instance'] = game_instance.to_dict()
+    return flask.redirect(flask.url_for('game'))
 
-def main():
-    print("Welcome to NationIO!")
-    menu()
-    choice = input("Enter your choice: ")
-    if choice == '1':
-        instance = GameInstance()
-        game(instance)
-    elif choice == '2':
-        return
-    else:
-        print("Invalid choice. Please try again.")
-        menu()
-    
+@app.route('/game/guess', methods=['POST'])
+def guess():
+    data = flask.session.get('game_instance')
+    if not data:
+        return flask.redirect(flask.url_for('game'))
+
+    game_instance = GameInstance.from_dict(data)
+    guess = flask.request.form['guess']
+    game_instance.guess(guess)
+    flask.session['game_instance'] = game_instance.to_dict()
+    return flask.redirect(flask.url_for('game'))
+
+@app.route('/game/new')
+def new_game():
+    game_instance = GameInstance()
+    game_instance.init_new_round()
+    game_instance.start()
+    flask.session['game_instance'] = game_instance.to_dict()
+    return flask.redirect(flask.url_for('game'))
+
 
 if __name__ == '__main__':
-    main()    
+    app.run(debug=True)
+

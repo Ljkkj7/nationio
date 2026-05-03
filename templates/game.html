@@ -2,13 +2,22 @@
 
 {% block content %}
 <div class="game-container">
+    {% if game_instance.hint_names[game_instance.current_hint] == 'Flag' %}
+    <h1>Current Hint | {{ game_instance.hint_names[game_instance.current_hint] }}:</h1>
+    <img src="{{ game_instance.hints[game_instance.rounds_played -1]['Flag'] }}" alt="">
+    {% else %}
     <h1>
         Current Hint | {{ game_instance.hint_names[game_instance.current_hint] }}:
         {{ game_instance.hints[game_instance.rounds_played -1][game_instance.hint_names[game_instance.current_hint]]}}
     </h1>
+    {% endif %}
     <div class="shown-hints">
         {% for hint in game_instance.shown_hints %}
+        {% if 'Flag' in hint %}
+        <img src="{{ game_instance.hints[game_instance.rounds_played -1]['Flag'] }}" alt="">
+        {% else %}
         <p>{{ hint }}</p>
+        {% endif %}
         {% endfor %}
     </div>
     <p>Score: {{ game_instance.score }} | Round: {{ game_instance.rounds_played }}</p>

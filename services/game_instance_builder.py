@@ -10,6 +10,7 @@ class GameInstanceMixin:
         self.hints = []
         self.hint_names = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
         self.shown_hints = []
+        self.answers = []
         self.current_hint = 0
     
     def new_game(self):
@@ -27,6 +28,7 @@ class GameInstance(GameInstanceMixin):
         self.hints = []
         self.hint_names = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
         self.shown_hints = []
+        self.answers = []
         self.current_hint = 0
 
     def start(self):
@@ -60,9 +62,11 @@ class GameInstance(GameInstanceMixin):
     def guess(self, guess):
         if guess.lower() == self.countries[self.rounds_played - 1].lower():
             self.score += (6-self.hints_shown_this_round)*5
+            self.answers.append(1)
             self.init_new_round()
         else:
             self.score -= 5
+            self.answers.append(0)
             self.init_new_round()
     
     def to_dict(self):
@@ -75,6 +79,7 @@ class GameInstance(GameInstanceMixin):
             'hint_names': self.hint_names,
             'shown_hints': self.shown_hints,
             'current_hint': self.current_hint,
+            'answers': self.answers,
         }
 
     @classmethod
@@ -88,4 +93,5 @@ class GameInstance(GameInstanceMixin):
         instance.hint_names = data['hint_names']
         instance.shown_hints = data['shown_hints']
         instance.current_hint = data['current_hint']
+        instance.answers = data['answers']
         return instance

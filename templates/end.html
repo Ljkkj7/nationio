@@ -7,7 +7,11 @@
     <div class="countries-revealed">
         <h2>Answers:</h2>
         {% for country in game_instance.countries %}
-        <p><strong>{{ loop.index }}.</strong> {{ country }}</p>
+        {% if game_instance.answers[loop.index - 1] == 1 %}
+        <p class="correct"><strong>{{ loop.index }}.</strong> {{ country }}</p>
+        {% else %}
+        <p class="incorrect"><strong>{{ loop.index }}.</strong> {{ country }}</p>
+        {% endif %}
         {% endfor %}
     </div>
     <div class="form-actions">

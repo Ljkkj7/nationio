@@ -11,6 +11,8 @@
     --accent: #4db87a;
     --accent-dark: #3da066;
     --accent-light: rgba(77, 184, 122, 0.12);
+    --incorrect-answer: #b60230;
+    --correct-answer: #10b981;
 
     --text-primary: #f0f0f0;
     --text-secondary: #a0a0a0;
@@ -421,10 +423,18 @@ form[action="/game/next-hint"] button:hover {
 }
 
 .countries-revealed p strong {
-    color: var(--accent);
+    color: white;
     font-size: 0.78rem;
     font-weight: 700;
     min-width: 22px;
+}
+
+.countries-revealed p.correct {
+    color: var(--correct-answer);
+}
+
+.countries-revealed p.incorrect {
+    color: var(--incorrect-answer);
 }
 
 ::-webkit-scrollbar {

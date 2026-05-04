@@ -13,9 +13,8 @@
         <nav class="nav-bar">
             <h1 class="title">NationIO</h1>
             <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Play</a></li>
-                <li><a href="#">About</a></li>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('new_game') }}">Play</a></li>
             </ul>
         </nav>
     </header>
@@ -23,9 +22,10 @@
     {% block content %}
     {% endblock %}
 
+
+    <footer>
+        <p>&copy; 2026 NationIO. All rights reserved.</p>
+    </footer>
 </body>
-<footer>
-    <p>&copy; 2026 NationIO. All rights reserved.</p>
-</footer>
 
 </html>

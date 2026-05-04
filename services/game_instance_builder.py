@@ -33,6 +33,15 @@ class GameInstance(GameInstanceMixin):
         self.countries = random_countries()
         self.hints = bundle_hints(self.countries)
 
+        count = 0
+        while self.hints is None and count < 3:
+            self.countries = random_countries()
+            self.hints = bundle_hints(self.countries)
+            count += 1
+        
+        if self.hints is None:
+            raise ValueError("Failed to generate hints. Try again later.")
+
     def init_new_round(self):
         self.rounds_played += 1
         self.hints_shown_this_round = 1

@@ -15,11 +15,10 @@ def index():
 
 @app.route('/game')
 def game():
-    data = flask.session.get('game_instance')
-    if not data:
-        return flask.redirect(flask.url_for('game'))
-
-    game_instance = GameInstance.from_dict(data)
+    game_instance = get_session_data()
+    
+    if game_instance is None:
+        return flask.redirect(flask.url_for('index'))
 
     if game_instance.rounds_played > 5:
         return flask.redirect(flask.url_for('end_game'))
@@ -27,11 +26,11 @@ def game():
 
 @app.route('/game/next-hint', methods=['POST'])
 def next_hint():
-    data = flask.session.get('game_instance')
-    if not data:
+    game_instance = get_session_data()
+    
+    if game_instance is None:
         return flask.redirect(flask.url_for('game'))
 
-    game_instance = GameInstance.from_dict(data)
     game_instance.show_next_hint()
 
     flask.session['game_instance'] = game_instance.to_dict()
@@ -39,11 +38,11 @@ def next_hint():
 
 @app.route('/game/guess', methods=['POST'])
 def guess():
-    data = flask.session.get('game_instance')
-    if not data:
+    game_instance = get_session_data()
+    
+    if game_instance is None:
         return flask.redirect(flask.url_for('game'))
 
-    game_instance = GameInstance.from_dict(data)
     guess = flask.request.form['guess']
     game_instance.guess(guess)
     flask.session['game_instance'] = game_instance.to_dict()
@@ -51,21 +50,33 @@ def guess():
 
 @app.route('/game/end')
 def end_game():
-    data = flask.session.get('game_instance')
-    if not data:
+    game_instance = get_session_data()
+    
+    if game_instance is None:
         return flask.redirect(flask.url_for('game'))
 
-    game_instance = GameInstance.from_dict(data)
     return flask.render_template('end.html', game_instance=game_instance)
 
 @app.route('/game/new')
 def new_game():
-    game_instance = GameInstance()
-    game_instance.init_new_round()
-    game_instance.start()
+    data = flask.session.get('game_instance')
+
+    if data:
+        game_instance = GameInstance.from_dict(data)
+    else:
+        game_instance = GameInstance()
+
+    game_instance.new_game()
     flask.session['game_instance'] = game_instance.to_dict()
+
     return flask.redirect(flask.url_for('game'))
 
+def get_session_data():
+    data = flask.session.get('game_instance')
+    if data:
+        return GameInstance.from_dict(data)
+    else:
+        return None
 
 if __name__ == '__main__':
     app.run(debug=True)

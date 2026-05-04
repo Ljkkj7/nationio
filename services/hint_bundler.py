@@ -9,8 +9,12 @@ async def fetch_hints(country, session):
         async with session.get(url) as res:
             if res.status == 200:
                 return await res.json()
-    except:
-        print('Error in fetching data from the API.')
+            else:
+                print(f'Error in fetching data from the API for country {country}: {res.status}')
+                return None
+    except Exception as e:
+        print(f'Error in fetching data from the API for country {country}: {e}')
+        return None
 
 async def fetch_all_hints(countries):
     async with aiohttp.ClientSession() as session:
@@ -26,6 +30,8 @@ def create_hints(hints):
     for hint in hints:
         if hint is None:
             continue
+        if not hint[0]['capital'] or not hint[0]['region'] or not hint[0]['population'] or not hint[0]['flag']['png'] or not hint[0]['currencies']:
+            return None
         hint_bundle.append({
             'Capital': hint[0]['capital'][0],
             'Region': hint[0]['region'],

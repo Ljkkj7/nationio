@@ -7,11 +7,16 @@ fetch(AUTOCOMPLETE_URL)
     });
 
 document.getElementById("guess").addEventListener("input", function () {
-    let lookupStr = this.value;
+    let lookupStr = this.value.toLowerCase();
+    document.getElementById("autocomplete-results").innerHTML = "";
 
-    for (let country of autocomplete[lookupStr[0].toLowerCase()]) {
-        if (country.startsWith(lookupStr)) {
-            console.log(country)
+    if (lookupStr.length === 0) {
+        return;
+    }
+
+    for (let country of autocomplete[lookupStr[0]]) {
+        if (country.toLowerCase().startsWith(lookupStr)) {
+            document.getElementById("autocomplete-results").innerHTML += `<div class="autocomplete-option"><p>${country}</p></div>`;
         }
     }
 });

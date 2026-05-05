@@ -4,7 +4,13 @@
 <div class="container">
     <p>Guess the country based on the hints.</p>
     <form action="/game/new">
-        <button type="submit" class="start-game-btn">Start Game</button>
+        <div class="difficulty-select">
+            <button type="button" class="difficulty-btn normal" id="normal">Normal</button>
+            <button type="button" class="difficulty-btn hard" id="hard">Hard</button>
+        </div>
+        <div class="start-select">
+            <button type="submit" class="start-game-btn">Start Game</button>
+        </div>
     </form>
 </div>
 {% endblock %}

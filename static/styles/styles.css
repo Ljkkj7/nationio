@@ -175,6 +175,46 @@ button,
     padding: 10px 22px;
     letter-spacing: 0.2px;
     transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    flex-direction: column;
+}
+
+.start-select {
+    display: flex;
+    flex-direction: column;
+    margin: 5px auto;
+}
+
+.difficulty-select {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.difficulty-btn {
+    border-radius: var(--radius-sm);
+    padding: 6px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.difficulty-btn.normal:hover,
+.difficulty-btn.normal:focus,
+.difficulty-btn.normal:focus-visible {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border);
+    transform: translateY(-1px);
+}
+
+.difficulty-btn.hard:hover,
+.difficulty-btn.hard:focus,
+.difficulty-btn.hard:focus-visible {
+    background: var(--incorrect-answer);
+    color: var(--text-primary);
+    border-color: var(--incorrect-answer);
+    transform: translateY(-1px);
 }
 
 .start-game-btn,
@@ -478,6 +518,8 @@ form[action="/game/next-hint"] button:hover {
 .autocomplete-option p:hover {
     background: var(--bg-hover);
 }
+
+
 
 ::-webkit-scrollbar {
     width: 6px;

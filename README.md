@@ -191,7 +191,7 @@ The API is free and requires no authentication. Data availability depends on RES
 
 - [ ] Add difficulty levels (e.g., hard mode skips capital as a hint)
 - [ ] Implement a leaderboard with persistent storage (SQLite / PostgreSQL)
-- [ ] Add an autocomplete dropdown for country name input
+- [x] Add an autocomplete dropdown for country name input
 - [ ] Support multiplayer sessions via WebSockets
 - [ ] Dockerise the application for easier deployment
 - [ ] Add comprehensive unit tests for `GameInstance` and `hint_bundler`

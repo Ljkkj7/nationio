@@ -1,6 +1,6 @@
 from services.hint_bundler import bundle_hints
 from utils.country_randomiser import random_countries
-from services.game_instance_builder import GameInstance
+from services.game_instance_builder import GameInstance, HardGameInstance
 import flask
 import os
 
@@ -59,22 +59,28 @@ def end_game():
 
 @app.route('/game/new')
 def new_game():
-    data = flask.session.get('game_instance')
-
-    if data:
-        game_instance = GameInstance.from_dict(data)
-    else:
-        game_instance = GameInstance()
-
+    game_instance = GameInstance()
     game_instance.new_game()
     flask.session['game_instance'] = game_instance.to_dict()
 
     return flask.redirect(flask.url_for('game'))
 
+@app.route('/game/new/hard')
+def new_hard_game():
+    game_instance = HardGameInstance()
+    game_instance.new_game()
+    flask.session['game_instance'] = game_instance.to_dict()
+
+    return flask.redirect(flask.url_for('game'))
+
+
 def get_session_data():
     data = flask.session.get('game_instance')
     if data:
-        return GameInstance.from_dict(data)
+        if data.get('difficulty') == 'hard':
+            return HardGameInstance.from_dict(data)
+        else:
+            return GameInstance.from_dict(data)
     else:
         return None
 

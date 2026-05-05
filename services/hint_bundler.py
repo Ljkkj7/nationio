@@ -25,22 +25,31 @@ async def fetch_all_hints(countries):
         
         return await asyncio.gather(*tasks)
 
-def create_hints(hints):
+def create_hints(hints, difficulty):
     hint_bundle = []
     for hint in hints:
         if hint is None:
             continue
         if not hint[0]['capital'] or not hint[0]['region'] or not hint[0]['population'] or not hint[0]['flag']['png'] or not hint[0]['currencies']:
             return None
-        hint_bundle.append({
-            'Capital': hint[0]['capital'][0],
-            'Region': hint[0]['region'],
-            'Population': hint[0]['population'],
-            'Flag': hint[0]['flag']['png'],
-            'Currencies': hint[0]['currencies'][0]['symbol'] + ' - ' + hint[0]['currencies'][0]['code'],
-        })
+        
+        if difficulty == 0:
+            hint_bundle.append({
+                'Capital': hint[0]['capital'][0],
+                'Region': hint[0]['region'],
+                'Population': hint[0]['population'],
+                'Flag': hint[0]['flag']['png'],
+                'Currencies': hint[0]['currencies'][0]['symbol'] + ' - ' + hint[0]['currencies'][0]['code'],
+            })
+        elif difficulty == 1:
+            hint_bundle.append({
+                'Region': hint[0]['region'],
+                'Population': hint[0]['population'],
+                'Flag': hint[0]['flag']['png'],
+                'Currencies': hint[0]['currencies'][0]['symbol'] + ' - ' + hint[0]['currencies'][0]['code'],
+            })
     return hint_bundle
 
-def bundle_hints(countries):
+def bundle_hints(countries, difficulty):
     hints = asyncio.run(fetch_all_hints(countries))
-    return create_hints(hints)
+    return create_hints(hints, difficulty)

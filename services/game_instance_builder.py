@@ -30,15 +30,16 @@ class GameInstance(GameInstanceMixin):
         self.shown_hints = []
         self.answers = []
         self.current_hint = 0
+        self.difficulty = 0
 
     def start(self):
         self.countries = random_countries()
-        self.hints = bundle_hints(self.countries)
+        self.hints = bundle_hints(self.countries, self.difficulty)
 
         count = 0
         while self.hints is None and count < 3:
             self.countries = random_countries()
-            self.hints = bundle_hints(self.countries)
+            self.hints = bundle_hints(self.countries, self.difficulty)
             count += 1
         
         if self.hints is None:
@@ -95,3 +96,13 @@ class GameInstance(GameInstanceMixin):
         instance.current_hint = data['current_hint']
         instance.answers = data['answers']
         return instance
+
+class HardGameInstance(GameInstance):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hint_names = ['Region', 'Population', 'Flag', 'Currencies']
+        self.difficulty = 1
+
+    
+
+    

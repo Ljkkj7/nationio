@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <p>Guess the country based on the hints.</p>
-    <form action="/game/new">
+    <form action="/game/new" id="newgame">
         <div class="difficulty-select">
             <button type="button" class="difficulty-btn normal" id="normal">Normal</button>
             <button type="button" class="difficulty-btn hard" id="hard">Hard</button>
@@ -13,4 +13,20 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    let diffcultySelect = document.querySelector('.difficulty-select');
+    const form = document.querySelector('form');
+
+    diffcultySelect.addEventListener('click', (e) => {
+        if (e.target.classList.contains('hard')) {
+            form.action = '/game/new/' + e.target.id;
+        }
+        else {
+            form.action = '/game/new'
+        }
+    })
+</script>
 {% endblock %}

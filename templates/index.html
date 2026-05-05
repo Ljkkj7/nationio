@@ -5,8 +5,33 @@
     <p>Guess the country based on the hints.</p>
     <form action="/game/new" id="newgame">
         <div class="difficulty-select">
-            <button type="button" class="difficulty-btn normal" id="normal">Normal</button>
-            <button type="button" class="difficulty-btn hard" id="hard">Hard</button>
+            <div class="difficulty-card">
+                <button type="button" class="difficulty-btn normal" id="normal">Normal</button>
+                <div class="info normal-info hide">
+                    <p><strong>Normal Difficulty:</strong></p>
+                    <ul class="info-list">
+                        <li>Capital city</li>
+                        <li>World region</li>
+                        <li>Population</li>
+                        <li>Flag</li>
+                        <li>Currency</li>
+                        <li>Autocomplete</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="difficulty-card">
+                <button type="button" class="difficulty-btn hard" id="hard">Hard</button>
+                <div class="info hard-info hide">
+                    <p><strong>Hard Difficulty:</strong></p>
+                    <ul class="info-list">
+                        <li>World region</li>
+                        <li>Population</li>
+                        <li>Flag</li>
+                        <li>Currency</li>
+                        <li>Autocomplete</li>
+                    </ul>
+                </div>
+            </div>
         </div>
         <div class="start-select">
             <button type="submit" class="start-game-btn">Start Game</button>
@@ -23,9 +48,25 @@
     diffcultySelect.addEventListener('click', (e) => {
         if (e.target.classList.contains('hard')) {
             form.action = '/game/new/' + e.target.id;
+            if (document.getElementsByClassName('hard-info')[0].classList.contains('hide')) {
+                document.getElementsByClassName('hard-info')[0].classList.remove('hide');
+                if (!document.getElementsByClassName('normal-info')[0].classList.contains('hide')) {
+                    document.getElementsByClassName('normal-info')[0].classList.add('hide');
+                }
+            } else {
+                document.getElementsByClassName('hard-info')[0].classList.add('hide');
+            }
         }
-        else {
+        else if (e.target.classList.contains('normal')) {
             form.action = '/game/new'
+            if (document.getElementsByClassName('normal-info')[0].classList.contains('hide')) {
+                document.getElementsByClassName('normal-info')[0].classList.remove('hide');
+                if (!document.getElementsByClassName('hard-info')[0].classList.contains('hide')) {
+                    document.getElementsByClassName('hard-info')[0].classList.add('hide');
+                }
+            } else {
+                document.getElementsByClassName('normal-info')[0].classList.add('hide');
+            }
         }
     })
 </script>

@@ -8,10 +8,11 @@ class GameInstanceMixin:
         self.hints_shown_this_round = 0
         self.countries = []
         self.hints = []
-        self.hint_names = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
+        self.hint_names = list(self.DEFAULT_HINT_NAMES)
         self.shown_hints = []
         self.answers = []
         self.current_hint = 0
+        self.difficulty = self.DEFAULT_DIFFICULTY
     
     def new_game(self):
         if self.rounds_played > 0:
@@ -20,11 +21,13 @@ class GameInstanceMixin:
         self.init_new_round()
 
 class GameInstance(GameInstanceMixin):
+    DEFAULT_HINT_NAMES = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
+    DEFAULT_DIFFICULTY = 0
+
     def __init__(self, country_source=random_countries, hint_bundler=bundle_hints):
-        self.reset_game()
         self.country_source = country_source
         self.hint_bundler = hint_bundler
-        self.difficulty = 0
+        self.reset_game()
 
     def start(self):
         self.countries = self.country_source()
@@ -92,10 +95,11 @@ class GameInstance(GameInstanceMixin):
         return instance
 
 class HardGameInstance(GameInstance):
+    DEFAULT_HINT_NAMES = ['Region', 'Population', 'Flag', 'Currencies']
+    DEFAULT_DIFFICULTY = 1
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hint_names = ['Region', 'Population', 'Flag', 'Currencies']
-        self.difficulty = 1
 
     
 

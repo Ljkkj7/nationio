@@ -24,8 +24,8 @@
 
     <div class="form-actions">
         <form action="/game/guess" method="post">
-            <input type="text" name="guess" class="guess-input" placeholder="Guess the country" autocomplete="off"
-                required>
+            <input type="text" id="guess" name="guess" class="guess-input" placeholder="Guess the country"
+                autocomplete="off" required>
             <button type="submit">Guess</button>
         </form>
 
@@ -34,4 +34,11 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    const AUTOCOMPLETE_URL = "{{ url_for('static', filename='scripts/autocomplete.json') }}";
+</script>
+<script src="{{ url_for('static', filename='scripts/autocomplete.js') }}"></script>
 {% endblock %}

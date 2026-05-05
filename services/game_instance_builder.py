@@ -20,26 +20,20 @@ class GameInstanceMixin:
         self.init_new_round()
 
 class GameInstance(GameInstanceMixin):
-    def __init__(self):
-        self.score = 30
-        self.rounds_played = 0
-        self.hints_shown_this_round = 0
-        self.countries = []
-        self.hints = []
-        self.hint_names = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
-        self.shown_hints = []
-        self.answers = []
-        self.current_hint = 0
+    def __init__(self, country_source=random_countries, hint_bundler=bundle_hints):
+        self.reset_game()
+        self.country_source = country_source
+        self.hint_bundler = hint_bundler
         self.difficulty = 0
 
     def start(self):
-        self.countries = random_countries()
-        self.hints = bundle_hints(self.countries, self.difficulty)
+        self.countries = self.country_source()
+        self.hints = self.hint_bundler(self.countries, self.difficulty)
 
         count = 0
         while self.hints is None and count < 3:
-            self.countries = random_countries()
-            self.hints = bundle_hints(self.countries, self.difficulty)
+            self.countries = self.country_source()
+            self.hints = self.hint_bundler(self.countries, self.difficulty)
             count += 1
         
         if self.hints is None:

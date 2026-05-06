@@ -32,6 +32,21 @@
                     </ul>
                 </div>
             </div>
+            <div class="difficulty-card">
+                <button type="button" class="difficulty-btn timed" id="timed">Hard</button>
+                <div class="info hard-info hide">
+                    <p><strong>Timed Difficulty:</strong></p>
+                    <ul class="info-list">
+                        <li>Capital</li>
+                        <li>World region</li>
+                        <li>Population</li>
+                        <li>Flag</li>
+                        <li>Currency</li>
+                        <li>Autocomplete</li>
+                        <li>60s timer per round</li>
+                    </ul>
+                </div>
+            </div>
         </div>
         <div class="start-select">
             <button type="submit" class="start-game-btn">Start Game</button>
@@ -67,6 +82,9 @@
             } else {
                 document.getElementsByClassName('normal-info')[0].classList.add('hide');
             }
+        }
+        else if (e.target.classList.contains('timed')) {
+            form.action = '/game/new/timed_normal'
         }
     })
 </script>

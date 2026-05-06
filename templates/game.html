@@ -2,6 +2,11 @@
 
 {% block content %}
 <div class="game-container">
+    {% if game_instance.timer %}
+    <div class="timer">
+        <p id="time_remaining">{{ game_instance.timer }}</p>
+    </div>
+    {% endif %}
     {% if game_instance.hint_names[game_instance.current_hint] == 'Flag' %}
     <h1>Current Hint | {{ game_instance.hint_names[game_instance.current_hint] }}:</h1>
     <img src="{{ game_instance.hints[game_instance.rounds_played -1]['Flag'] }}" alt="">
@@ -46,4 +51,12 @@
     const AUTOCOMPLETE_URL = "{{ url_for('static', filename='scripts/autocomplete.json') }}";
 </script>
 <script src="{{ url_for('static', filename='scripts/autocomplete.js') }}"></script>
+<script>
+    setInterval(() => {
+        let timerElement = document.getElementById('time_remaining');
+        var timer = parseInt(timerElement.innerText)
+        timer -= 1
+        timerElement.innerText = timer
+    }, 1000);
+</script>
 {% endblock %}

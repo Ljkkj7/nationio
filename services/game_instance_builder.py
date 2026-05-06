@@ -78,6 +78,7 @@ class GameInstance(GameInstanceMixin):
             'shown_hints': self.shown_hints,
             'current_hint': self.current_hint,
             'answers': self.answers,
+            'timer': self.timer
         }
 
     @classmethod
@@ -92,6 +93,8 @@ class GameInstance(GameInstanceMixin):
         instance.shown_hints = data['shown_hints']
         instance.current_hint = data['current_hint']
         instance.answers = data['answers']
+        if data['timer']:
+            instance.timer = data['timer']
         return instance
 
 class HardGameInstance(GameInstance):
@@ -100,6 +103,25 @@ class HardGameInstance(GameInstance):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+class TimedGameInstance(GameInstance):
+    DEFAULT_HINT_NAMES = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
+    DEFAULT_DIFFICULTY = 0
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.timer = 60
+    
+    def guess(self, guess, time_remaining):
+        if guess.lower() == self.countries[self.rounds_played - 1].lower():
+            self.score += (6-self.hints_shown_this_round)*5*(time_remaining/10)
+            self.answers.append(1)
+            self.init_new_round()
+        else:
+            self.score -= 5
+            self.answers.append(0)
+            self.init_new_round()
+
 
     
 

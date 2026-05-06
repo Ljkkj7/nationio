@@ -1,6 +1,6 @@
 from services.hint_bundler import bundle_hints
 from utils.country_randomiser import random_countries
-from services.game_instance_builder import GameInstance, HardGameInstance
+from services.game_instance_builder import GameInstance, HardGameInstance, TimedGameInstance
 import flask
 import os
 
@@ -73,12 +73,22 @@ def new_hard_game():
 
     return flask.redirect(flask.url_for('game'))
 
+@app.route('/game/new/timed_normal')
+def new_timed_game():
+    game_instance = TimedGameInstance()
+    game_instance.new_game()
+    flask.session['game_instance'] = game_instance.to_dict()
+
+    return flask.redirect(flask.url_for('game'))
+
 
 def get_session_data():
     data = flask.session.get('game_instance')
     if data:
         if data.get('difficulty') == 'hard':
             return HardGameInstance.from_dict(data)
+        if data.get('difficulty') == 'timed':
+            return TimedGameInstance.from_dict(data)
         else:
             return GameInstance.from_dict(data)
     else:

@@ -1,14 +1,21 @@
 import asyncio
 import aiohttp
 from aiohttp import ClientSession
+from utils.extensions import cache
 
 
 async def fetch_hints(country, session):
+    cache_key = f'hints_{country}'
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
     url = f'https://restcountries.com/v4/name/{country}?fullText=true&fields=name,region,capital,population,flag,currencies'
     try:
-        async with session.get(url) as res:
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as res:
             if res.status == 200:
-                return await res.json()
+                data = await res.json()
+                cache.set(cache_key, data, timeout=86400)
+                return data
             else:
                 print(f'Error in fetching data from the API for country {country}: {res.status}')
                 return None

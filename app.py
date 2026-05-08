@@ -1,5 +1,6 @@
 from services.hint_bundler import bundle_hints
 from utils.country_randomiser import random_countries
+from utils.extensions import cache
 from services.game_instance_builder import GameInstance, HardGameInstance, TimedGameInstance
 import flask
 import os
@@ -8,6 +9,7 @@ secret_key = os.urandom(16).hex()
 
 app = flask.Flask(__name__)
 app.secret_key = secret_key
+cache.init_app(app)
 
 @app.route('/')
 def index():

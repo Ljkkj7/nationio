@@ -1,5 +1,7 @@
 from services.hint_bundler import bundle_hints
 from utils.country_randomiser import random_countries
+import time
+import sys
 
 class GameInstanceMixin:
     def reset_game(self):
@@ -34,12 +36,17 @@ class GameInstance(GameInstanceMixin):
 
     def start(self):
         self.countries = self.country_source()
+        t = time.time()
         self.hints = self.hint_bundler(self.countries, self.difficulty)
+        print(f"Time taken to generate hints: {time.time() - t:.2f}", file=sys.stderr)
 
         count = 0
         while self.hints is None and count < 3:
             self.countries = self.country_source()
+            t = time.time()
             self.hints = self.hint_bundler(self.countries, self.difficulty)
+            print(f"Time taken to generate hints: {time.time() - t:.2f}", file=sys.stderr)
+
             count += 1
         
         if self.hints is None:
@@ -60,7 +67,8 @@ class GameInstance(GameInstanceMixin):
             self.shown_hints.append(f"{self.hint_names[self.current_hint]}: {self.hints[self.rounds_played - 1][self.hint_names[self.current_hint]]}")
             self.current_hint += 1
             self.hints_shown_this_round += 1
-            self.score -= 5
+            if self.score > 0:
+                self.score -= 5
     
     def guess(self, guess):
         if guess.lower() == self.countries[self.rounds_played - 1].lower():
@@ -68,7 +76,8 @@ class GameInstance(GameInstanceMixin):
             self.answers.append(1)
             self.init_new_round()
         else:
-            self.score -= 5
+            if self.score > 0:
+                self.score -= 5
             self.answers.append(0)
             self.init_new_round()
     
@@ -83,7 +92,7 @@ class GameInstance(GameInstanceMixin):
             'shown_hints': self.shown_hints,
             'current_hint': self.current_hint,
             'answers': self.answers,
-            'timer': self.timer
+            'timer': self.timer if hasattr(self, 'timer') else None
         }
 
     @classmethod
@@ -124,7 +133,8 @@ class TimedGameInstance(GameInstance):
             self.answers.append(1)
             self.init_new_round()
         else:
-            self.score -= 5
+            if self.score > 0:
+                self.score -= 5
             self.answers.append(0)
             self.init_new_round()
 

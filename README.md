@@ -52,7 +52,6 @@ Hard mode removes the Capital hint and increases internal difficulty, forcing pl
 ```
 nationio/
 ├── app.py                          # Flask application & route definitions
-├── extensions.py                   # Flask extension instances (cache)
 ├── countrynames.csv                # Local dataset of ~250 country names
 ├── requirements.txt                # Python dependencies
 │
@@ -63,6 +62,8 @@ nationio/
 ├── utils/
 │   ├── country_randomiser.py       # Random country sampling from CSV
 │   ├── country_name_csv_packer.py  # One-time script to populate countrynames.csv
+│   ├── autocomplet_dict_packer.py  # One-time script to populate autocomplete.json
+│   ├── extensions.py               # Flask extension instances (cache)
 │   └── __init__.py
 │
 ├── templates/

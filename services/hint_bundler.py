@@ -4,30 +4,31 @@ from aiohttp import ClientSession
 from utils.extensions import cache
 
 
-async def fetch_hints(country, session):
-    cache_key = f'hints_{country}'
+async def fetch_hints(country_code, session):
+    cache_key = f'hints_{country_code}'
     cached = cache.get(cache_key)
     if cached:
         return cached
-    url = f'https://restcountries.com/v4/name/{country}?fullText=true&fields=name,region,capital,population,flag,currencies'
+    url = f'https://restcountries.com/v4/alpha?codes={country_code}&fields=name,region,capital,population,flag,currencies'
     try:
-        async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as res:
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as res:
+            print(f'{res.status} -------------------- {country_code}')
             if res.status == 200:
                 data = await res.json()
                 cache.set(cache_key, data, timeout=86400)
                 return data
             else:
-                print(f'Error in fetching data from the API for country {country}: {res.status}')
+                print(f'Error in fetching data from the API for country {country_code}: {res.status} (timed out)')
                 return None
     except Exception as e:
-        print(f'Error in fetching data from the API for country {country}: {e}')
+        print(f'Error in fetching data from the API for country {country_code}: {e}')
         return None
 
-async def fetch_all_hints(countries):
+async def fetch_all_hints(country_codes):
     async with aiohttp.ClientSession() as session:
         tasks = [
-            fetch_hints(country, session)
-            for country in countries
+            fetch_hints(country_code, session)
+            for country_code in country_codes
         ]
         
         return await asyncio.gather(*tasks)
@@ -40,7 +41,7 @@ def create_hints(hints, difficulty):
         if not hint[0]['capital'] or not hint[0]['region'] or not hint[0]['population'] or not hint[0]['flag']['png'] or not hint[0]['currencies']:
             return None
         
-        if difficulty == 0:
+        if difficulty == 0 or difficulty == 2:
             hint_bundle.append({
                 'Capital': hint[0]['capital'][0],
                 'Region': hint[0]['region'],
@@ -57,6 +58,15 @@ def create_hints(hints, difficulty):
             })
     return hint_bundle
 
-def bundle_hints(countries, difficulty):
-    hints = asyncio.run(fetch_all_hints(countries))
+def bundle_hints(hints, difficulty):
     return create_hints(hints, difficulty)
+
+def bundle_country_names(hints):
+    names = []
+    for hint in hints:
+        names.append(hint[0]['name']['common'])
+    return names
+
+def bundle_json(country_codes, difficulty):
+    hints = asyncio.run(fetch_all_hints(country_codes))
+    return bundle_hints(hints, difficulty), bundle_country_names(hints)

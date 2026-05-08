@@ -1,5 +1,5 @@
 from services.hint_bundler import bundle_hints
-from utils.country_randomiser import random_countries
+from utils.country_randomiser import random_country_codes
 from utils.extensions import cache
 from services.game_instance_builder import GameInstance, HardGameInstance, TimedGameInstance
 import flask

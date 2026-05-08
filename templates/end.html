@@ -6,7 +6,7 @@
     <p>Final Score: {{ game_instance.score }}</p>
     <div class="countries-revealed">
         <h2>Answers:</h2>
-        {% for country in game_instance.countries %}
+        {% for country in game_instance.country_names %}
         {% if game_instance.answers[loop.index - 1] == 1 %}
         <p class="correct"><strong>{{ loop.index }}.</strong> {{ country }}</p>
         {% else %}
@@ -15,9 +15,24 @@
         {% endfor %}
     </div>
     <div class="form-actions">
+
+        {% if game_instance.difficulty == 2 %}
+        <form action="/game/new/timed">
+            <button type="submit" class="start-game-btn">Play Again</button>
+        </form>
+
+        {% elif game_instance.difficulty == 1 %}
+        <form action="/game/new/hard">
+            <button type="submit" class="start-game-btn">Play Again</button>
+        </form>
+
+        {% elif game_instance.difficulty == 0 %}
         <form action="/game/new">
             <button type="submit" class="start-game-btn">Play Again</button>
         </form>
+
+        {% endif %}
+
         <form action="/">
             <button type="submit" class="start-game-btn">Back to Home</button>
         </form>

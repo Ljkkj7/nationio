@@ -1,5 +1,5 @@
-from services.hint_bundler import bundle_hints
-from utils.country_randomiser import random_countries
+from services.hint_bundler import bundle_json
+from utils.country_randomiser import random_country_codes
 import time
 import sys
 
@@ -15,6 +15,7 @@ class GameInstanceMixin:
         self.answers = []
         self.current_hint = 0
         self.difficulty = self.DEFAULT_DIFFICULTY
+        self.country_names = []
     
     def new_game(self):
         if self.rounds_played > 0:
@@ -29,22 +30,25 @@ class GameInstance(GameInstanceMixin):
     DEFAULT_HINT_NAMES = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
     DEFAULT_DIFFICULTY = 0
 
-    def __init__(self, country_source=random_countries, hint_bundler=bundle_hints):
+    def __init__(self, country_source=random_country_codes, json_bundler=bundle_json):
         self.country_source = country_source
-        self.hint_bundler = hint_bundler
+        self.json_bundler = json_bundler
         self.reset_game()
 
     def start(self):
         self.countries = self.country_source()
         t = time.time()
-        self.hints = self.hint_bundler(self.countries, self.difficulty)
+        self.hints, self.country_names = self.json_bundler(self.countries, self.difficulty)
+        print(f"Countries: {self.countries}", file=sys.stderr)
+        print(f"Hints: {self.hints}", file=sys.stderr)
+        print(f"Country names: {self.country_names}", file=sys.stderr)
         print(f"Time taken to generate hints: {time.time() - t:.2f}", file=sys.stderr)
 
         count = 0
-        while self.hints is None and count < 3:
+        while (self.hints is None or len(self.hints) < 4) and count < 3:
             self.countries = self.country_source()
             t = time.time()
-            self.hints = self.hint_bundler(self.countries, self.difficulty)
+            self.hints, self.country_names = self.json_bundler(self.countries, self.difficulty)
             print(f"Time taken to generate hints: {time.time() - t:.2f}", file=sys.stderr)
 
             count += 1
@@ -71,15 +75,14 @@ class GameInstance(GameInstanceMixin):
                 self.score -= 5
     
     def guess(self, guess):
-        if guess.lower() == self.countries[self.rounds_played - 1].lower():
+        if guess.lower() == self.country_names[self.rounds_played - 1].lower():
             self.score += (6-self.hints_shown_this_round)*5
             self.answers.append(1)
-            self.init_new_round()
         else:
             if self.score > 0:
                 self.score -= 5
             self.answers.append(0)
-            self.init_new_round()
+        self.init_new_round()
     
     def to_dict(self):
         return {
@@ -92,6 +95,8 @@ class GameInstance(GameInstanceMixin):
             'shown_hints': self.shown_hints,
             'current_hint': self.current_hint,
             'answers': self.answers,
+            'country_names': self.country_names,
+            'difficulty': self.difficulty,
             'timer': self.timer if hasattr(self, 'timer') else None
         }
 
@@ -107,6 +112,8 @@ class GameInstance(GameInstanceMixin):
         instance.shown_hints = data['shown_hints']
         instance.current_hint = data['current_hint']
         instance.answers = data['answers']
+        instance.country_names = data['country_names']
+        instance.difficulty = data['difficulty']
         if data['timer']:
             instance.timer = data['timer']
         return instance
@@ -120,7 +127,7 @@ class HardGameInstance(GameInstance):
 
 class TimedGameInstance(GameInstance):
     DEFAULT_HINT_NAMES = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
-    DEFAULT_DIFFICULTY = 0
+    DEFAULT_DIFFICULTY = 2
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -128,7 +135,7 @@ class TimedGameInstance(GameInstance):
     
     def guess(self, guess):
         time_remaining = self.timer
-        if guess.lower() == self.countries[self.rounds_played - 1].lower():
+        if guess.lower() == self.country_names[self.rounds_played - 1].lower():
             self.score += (6-self.hints_shown_this_round)*5*(time_remaining/3)
             self.answers.append(1)
             self.init_new_round()

@@ -31,6 +31,9 @@ def next_hint():
     if game_instance is None:
         return flask.redirect(flask.url_for('game'))
 
+    if hasattr(game_instance, 'timer'):
+        game_instance.stash_timer(flask.request.form['time_remaining'])
+
     game_instance.show_next_hint()
 
     flask.session['game_instance'] = game_instance.to_dict()

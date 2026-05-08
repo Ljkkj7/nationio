@@ -20,6 +20,9 @@ class GameInstanceMixin:
         self.start()
         self.init_new_round()
 
+    def stash_timer(self, time_remaining):
+        self.timer = time_remaining
+
 class GameInstance(GameInstanceMixin):
     DEFAULT_HINT_NAMES = ['Capital', 'Region', 'Population', 'Flag', 'Currencies']
     DEFAULT_DIFFICULTY = 0
@@ -47,6 +50,8 @@ class GameInstance(GameInstanceMixin):
         self.hints_shown_this_round = 1
         self.current_hint = 0
         self.shown_hints = []
+        if hasattr(self, 'timer'):
+            self.timer = 60 
 
     def show_next_hint(self):
         if self.current_hint >= len(self.hint_names):
@@ -112,9 +117,10 @@ class TimedGameInstance(GameInstance):
         super().__init__(*args, **kwargs)
         self.timer = 60
     
-    def guess(self, guess, time_remaining):
+    def guess(self, guess):
+        time_remaining = self.timer
         if guess.lower() == self.countries[self.rounds_played - 1].lower():
-            self.score += (6-self.hints_shown_this_round)*5*(time_remaining/10)
+            self.score += (6-self.hints_shown_this_round)*5*(time_remaining/3)
             self.answers.append(1)
             self.init_new_round()
         else:

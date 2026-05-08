@@ -34,7 +34,8 @@
             <button type="submit">Guess</button>
         </form>
 
-        <form action="/game/next-hint" method="POST">
+        <form action="/game/next-hint" method="POST" id="next-hint-form">
+            <input type="hidden" name="time_remaining" id="time_remaining_input" value="">
             <button type="submit">Next Hint</button>
         </form>
     </div>
@@ -52,11 +53,14 @@
 </script>
 <script src="{{ url_for('static', filename='scripts/autocomplete.js') }}"></script>
 <script>
+    let timer = parseInt(document.getElementById('time_remaining').innerText);
     setInterval(() => {
-        let timerElement = document.getElementById('time_remaining');
-        var timer = parseInt(timerElement.innerText)
         timer -= 1
-        timerElement.innerText = timer
+        document.getElementById('time_remaining').innerText = timer
     }, 1000);
+
+    document.getElementById('next-hint-form').addEventListener('submit', () => {
+        document.getElementById('time_remaining_input').value = timer;
+    });
 </script>
 {% endblock %}

@@ -25,11 +25,11 @@ Each game consists of **5 rounds**. In every round:
 | Action | Points |
 |---|---|
 | Starting score | 30 |
-| Guessing correctly (fewer hints used = more points) | `(6 - hints_shown) × 5` |
+| Correct guess (fewer hints = more points) | `(6 - hints_shown) × 5` |
 | Requesting an extra hint | −5 |
 | Incorrect guess | −5 |
 
-The maximum achievable score per round is **25 points** (correct guess on the first hint, no extra hints revealed).
+The maximum achievable score per round is **25 points** (correct on the first hint).
 
 ### Hint Sequence
 
@@ -41,6 +41,10 @@ The maximum achievable score per round is **25 points** (correct guess on the fi
 | 4 | Flag | The country's flag (displayed as an image) |
 | 5 | Currencies | Currency symbol and ISO code |
 
+### Hard Mode
+
+Hard mode removes the Capital hint and increases internal difficulty, forcing players to rely on region, population, flag, and currency alone. It is implemented as a `HardGameInstance` subclass of `GameInstance`, following the Open/Closed principle — no core game logic was modified.
+
 ---
 
 ## 🏗️ Architecture
@@ -48,12 +52,13 @@ The maximum achievable score per round is **25 points** (correct guess on the fi
 ```
 nationio/
 ├── app.py                          # Flask application & route definitions
+├── extensions.py                   # Flask extension instances (cache)
 ├── countrynames.csv                # Local dataset of ~250 country names
 ├── requirements.txt                # Python dependencies
 │
 ├── services/
-│   ├── game_instance_builder.py    # GameInstance class — core game state & logic
-│   └── hint_bundler.py             # Async API fetching & hint assembly
+│   ├── game_instance_builder.py    # GameInstance & HardGameInstance — game state & logic
+│   └── hint_bundler.py             # Async API fetching, caching & hint assembly
 │
 ├── utils/
 │   ├── country_randomiser.py       # Random country sampling from CSV
@@ -67,6 +72,7 @@ nationio/
 │   └── end.html                    # End-of-game results screen
 │
 └── static/
+    ├── autocomplete.json           # Pre-built country name index for autocomplete
     └── styles/
         └── styles.css              # Global stylesheet
 ```
@@ -79,28 +85,43 @@ Defines all HTTP routes and manages Flask sessions. Game state is serialised to 
 | Route | Method | Description |
 |---|---|---|
 | `/` | GET | Landing page |
-| `/game/new` | GET | Initialises or resets a game session |
+| `/game/new` | GET | Initialises or resets a standard game session |
+| `/game/new/hard` | GET | Initialises a hard mode game session |
 | `/game` | GET | Renders the active round |
 | `/game/next-hint` | POST | Reveals the next hint, saves state |
 | `/game/guess` | POST | Processes the player's guess, saves state |
 | `/game/end` | GET | Renders the final results screen |
 
 #### `services/game_instance_builder.py` — Game Logic
-The `GameInstance` class is the heart of the application. It manages:
-- Round progression (`rounds_played`, `init_new_round`)
-- Hint visibility state (`current_hint`, `shown_hints`)
-- Score calculation on correct/incorrect guesses
-- Full serialisation to/from a plain dictionary for Flask session storage
-- A `GameInstanceMixin` for cleanly separating `reset_game` and `new_game` logic
 
-#### `services/hint_bundler.py` — Async API Layer
-Uses `asyncio` and `aiohttp` to **concurrently fetch** hint data for all 5 countries in a single game from the [REST Countries API](https://restcountries.com/) (v4). All 5 network requests are fired in parallel via `asyncio.gather`, keeping load times low. If any country's data is incomplete, the entire batch is discarded and retried (up to 3 attempts).
+The game logic is structured across three classes:
+
+- **`GameInstanceMixin`** — handles `reset_game` and `new_game` orchestration, keeping lifecycle logic separate from state
+- **`GameInstance`** — core game state, round progression, hint visibility, score calculation, and full dict serialisation for Flask session storage. Accepts injected `country_source` and `hint_bundler` dependencies for testability
+- **`HardGameInstance(GameInstance)`** — subclass that overrides `DEFAULT_HINT_NAMES` and `DEFAULT_DIFFICULTY` to configure hard mode without modifying the base class
+
+#### `services/hint_bundler.py` — Async API Layer with Caching
+
+Uses `asyncio` and `aiohttp` to **concurrently fetch** hint data for all 5 countries via `asyncio.gather`. Per-country responses are cached using **Flask-Caching** (`SimpleCache`) with a 24-hour TTL, reducing repeat game load times from ~14s to ~0.3s. A 5-second per-request timeout prevents slow upstream responses from hanging the game. If any country's data is incomplete, the batch is discarded and retried up to 3 times.
 
 #### `utils/country_randomiser.py`
-Reads `countrynames.csv` and uses `random.sample` to select 5 unique countries per game, ensuring no repeats within a session.
+Reads `countrynames.csv` and uses `random.sample` to select 5 unique countries per game.
 
-#### `utils/country_name_csv_packer.py`
-A standalone one-time script that calls the REST Countries API and writes all country common names to `countrynames.csv`. Run this to refresh the country list.
+#### `static/autocomplete.json`
+A pre-indexed JSON file mapping first letters to country names, used to power the guess input's autocomplete dropdown client-side without any additional API calls.
+
+---
+
+## ⚡ Performance
+
+| Metric | Before | After |
+|---|---|---|
+| New game load time | ~14s | ~0.3s |
+
+Achieved by:
+- Parallelising all 5 country API requests with `asyncio.gather`
+- Caching per-country API responses with Flask-Caching (24hr TTL)
+- Adding per-request timeouts via `aiohttp.ClientTimeout`
 
 ---
 
@@ -115,7 +136,7 @@ A standalone one-time script that calls the REST Countries API and writes all co
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/nationio.git
+   git clone https://github.com/Ljkkj7/nationio.git
    cd nationio
    ```
 
@@ -158,6 +179,7 @@ A standalone one-time script that calls the REST Countries API and writes all co
 | Package | Purpose |
 |---|---|
 | `Flask` | Web framework and session management |
+| `Flask-Caching` | Server-side response caching |
 | `aiohttp` | Async HTTP client for concurrent API requests |
 | `requests` | Sync HTTP client (used by the CSV packer script) |
 
@@ -174,27 +196,30 @@ NationIO fetches live hint data from the **[REST Countries API](https://restcoun
 GET https://restcountries.com/v4/name/{country}?fullText=true&fields=name,region,capital,population,flag,currencies
 ```
 
-The API is free and requires no authentication. Data availability depends on REST Countries uptime; the application includes retry logic (up to 3 attempts) to handle transient failures gracefully.
+The API is free and requires no authentication. Responses are cached per-country for 24 hours. The application includes retry logic (up to 3 attempts) to handle transient failures gracefully.
 
 ---
 
 ## 🧩 Design Decisions
 
-- **Session-based state**: Flask's signed cookie session is used to persist `GameInstance` state between requests. The game object is fully serialised to a plain dictionary on every write and deserialised on every read, making the server fully stateless between requests.
-- **Async concurrency**: `aiohttp` + `asyncio.gather` fires all 5 country API requests in parallel, reducing round-start latency significantly versus sequential requests.
-- **Local country CSV**: A local dataset of country names decouples country selection from the API, avoiding an extra network call just to pick which countries to use.
-- **Mixin pattern**: `GameInstanceMixin` separates reset/new-game orchestration from the core `GameInstance` class, keeping responsibilities clean.
+- **Session-based state**: Flask's signed cookie session persists `GameInstance` state between requests. The game object is fully serialised to a plain dictionary on every write and deserialised on every read, keeping the server stateless.
+- **Dependency injection**: `GameInstance` accepts `country_source` and `hint_bundler` as constructor arguments, decoupling it from concrete implementations and making it straightforward to test with mocks.
+- **Subclass-based difficulty**: `HardGameInstance` overrides class-level defaults (`DEFAULT_HINT_NAMES`, `DEFAULT_DIFFICULTY`) rather than branching inside `GameInstance`, following the Open/Closed principle.
+- **Async concurrency + caching**: `aiohttp` + `asyncio.gather` fires all 5 country API requests in parallel. Flask-Caching stores results per country, so repeat games are served from cache with no network overhead.
+- **Client-side autocomplete**: Country name suggestions are served from a static pre-indexed JSON file, avoiding any server round-trip on keypress.
+- **Local country CSV**: A local dataset decouples country selection from the API, avoiding an extra network call just to pick which countries to use.
 
 ---
 
 ## 🔮 Potential Improvements
 
-- [ ] Add difficulty levels (e.g., hard mode skips capital as a hint)
-- [ ] Implement a leaderboard with persistent storage (SQLite / PostgreSQL)
-- [x] Add an autocomplete dropdown for country name input
-- [ ] Support multiplayer sessions via WebSockets
+- [ ] Leaderboard with persistent storage (SQLite / PostgreSQL)
+- [ ] Multiplayer sessions via WebSockets
 - [ ] Dockerise the application for easier deployment
-- [ ] Add comprehensive unit tests for `GameInstance` and `hint_bundler`
+- [ ] Unit tests for `GameInstance` and `hint_bundler`
+- [x] Hard mode (reduced hint set, increased difficulty)
+- [x] Autocomplete dropdown for country name input
+- [x] API response caching to minimise latency
 
 ---
 

@@ -199,6 +199,15 @@ button,
     transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
 }
 
+.difficulty-btn:hover,
+.difficulty-btn:focus,
+.difficulty-btn:focus-visible {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border);
+    transform: translateY(-1px);
+}
+
 .difficulty-btn.normal:hover,
 .difficulty-btn.normal:focus,
 .difficulty-btn.normal:focus-visible {
@@ -211,6 +220,15 @@ button,
 .difficulty-btn.hard:hover,
 .difficulty-btn.hard:focus,
 .difficulty-btn.hard:focus-visible {
+    background: var(--incorrect-answer);
+    color: var(--text-primary);
+    border-color: var(--incorrect-answer);
+    transform: translateY(-1px);
+}
+
+.difficulty-btn.timed:hover,
+.difficulty-btn.timed:focus,
+.difficulty-btn.timed:focus-visible {
     background: var(--incorrect-answer);
     color: var(--text-primary);
     border-color: var(--incorrect-answer);

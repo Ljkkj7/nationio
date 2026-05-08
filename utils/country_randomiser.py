@@ -6,5 +6,5 @@ def read_country_codes(filename):
         reader = csv.reader(f)
         return [row[0] for row in reader if row]
 
-def random_country_codes():
-    return random.sample(read_country_codes('countrycodes.csv'), k=5)
+def random_country_codes(k):
+    return random.sample(read_country_codes('countrycodes.csv'), k=k)

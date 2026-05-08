@@ -6,7 +6,7 @@
     <p>Final Score: {{ game_instance.score }}</p>
     <div class="countries-revealed">
         <h2>Answers:</h2>
-        {% for country in game_instance.country_names %}
+        {% for country in game_instance.countries %}
         {% if game_instance.answers[loop.index - 1] == 1 %}
         <p class="correct"><strong>{{ loop.index }}.</strong> {{ country }}</p>
         {% else %}

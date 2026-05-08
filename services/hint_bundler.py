@@ -2,6 +2,7 @@ import asyncio
 import aiohttp
 from aiohttp import ClientSession
 from utils.extensions import cache
+from utils.country_randomiser import random_country_codes
 
 
 async def fetch_hints(country_code, session):
@@ -11,7 +12,7 @@ async def fetch_hints(country_code, session):
         return cached
     url = f'https://restcountries.com/v4/alpha?codes={country_code}&fields=name,region,capital,population,flag,currencies'
     try:
-        async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as res:
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=2)) as res:
             print(f'{res.status} -------------------- {country_code}')
             if res.status == 200:
                 data = await res.json()
@@ -38,8 +39,6 @@ def create_hints(hints, difficulty):
     for hint in hints:
         if hint is None:
             continue
-        if not hint[0]['capital'] or not hint[0]['region'] or not hint[0]['population'] or not hint[0]['flag']['png'] or not hint[0]['currencies']:
-            return None
         
         if difficulty == 0 or difficulty == 2:
             hint_bundle.append({
@@ -67,6 +66,44 @@ def bundle_country_names(hints):
         names.append(hint[0]['name']['common'])
     return names
 
-def bundle_json(country_codes, difficulty):
-    hints = asyncio.run(fetch_all_hints(country_codes))
-    return bundle_hints(hints, difficulty), bundle_country_names(hints)
+def fetch_new_code(num_codes):
+    return random_country_codes(num_codes)
+
+def is_complete(entry):
+    h = entry[0]
+    return h['capital'] and h['region'] and h['population'] and h['flag']['png'] and h['currencies']
+
+
+def bundle_json(difficulty, target=5):
+    all_codes = fetch_new_code(target)
+    valid_tries = []
+
+    attempts = 0
+    max_attempts = 3
+
+    while len(valid_tries) < target and attempts < max_attempts:
+        needed = target - len(valid_tries)
+
+        batch_codes = all_codes[:needed]
+        raw_fetch = asyncio.run(fetch_all_hints(batch_codes))
+
+        for entry in raw_fetch:
+            if entry is not None and is_complete(entry):
+                valid_tries.append(entry)
+            else:
+                new_codes = fetch_new_code(target-len(valid_tries))
+                for i in new_codes:
+                    all_codes.append(i)
+
+        all_codes = all_codes[needed:]
+        attempts += 1
+    
+    if len(valid_tries) != target:
+        raise ValueError("Failed to generate hints. Try again later.")
+
+    hints_bundle = create_hints(valid_tries, difficulty)
+    country_names = bundle_country_names(valid_tries)
+
+    return hints_bundle, country_names
+        
+        

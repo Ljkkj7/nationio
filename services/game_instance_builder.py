@@ -40,18 +40,6 @@ class GameInstance(GameInstanceMixin):
         print(f"Hints: {self.hints}", file=sys.stderr)
         print(f"Time taken to generate hints: {time.time() - t:.2f}", file=sys.stderr)
 
-        count = 0
-        while (self.hints is None or len(self.hints) < 4) and count < 3:
-            self.countries = self.country_source()
-            t = time.time()
-            self.hints, self.country_names = self.json_bundler(self.countries, self.difficulty)
-            print(f"Time taken to generate hints: {time.time() - t:.2f}", file=sys.stderr)
-
-            count += 1
-        
-        if self.hints is None:
-            raise ValueError("Failed to generate hints. Try again later.")
-
     def init_new_round(self):
         self.rounds_played += 1
         self.hints_shown_this_round = 1

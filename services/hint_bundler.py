@@ -90,12 +90,13 @@ def bundle_json(difficulty, target=5):
         for entry in raw_fetch:
             if entry is not None and is_complete(entry):
                 valid_tries.append(entry)
-            else:
-                new_codes = fetch_new_code(target-len(valid_tries))
-                for i in new_codes:
-                    all_codes.append(i)
-
+        
         all_codes = all_codes[needed:]
+
+        still_needed = target - len(valid_tries)
+        if still_needed > 0:
+            all_codes.extend(fetch_new_code(still_needed))
+            
         attempts += 1
     
     if len(valid_tries) != target:

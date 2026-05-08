@@ -90,9 +90,9 @@ def new_timed_game():
 def get_session_data():
     data = flask.session.get('game_instance')
     if data:
-        if data.get('difficulty') == 'hard':
+        if data.get('difficulty') == 1:
             return HardGameInstance.from_dict(data)
-        if data.get('difficulty') == 'timed':
+        elif data.get('difficulty') == 2:
             return TimedGameInstance.from_dict(data)
         else:
             return GameInstance.from_dict(data)

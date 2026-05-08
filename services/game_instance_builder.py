@@ -114,6 +114,7 @@ class TimedGameInstance(GameInstance):
         super().__init__(*args, **kwargs)
         self.timer = 60
     
+    
     def guess(self, guess):
         time_remaining = self.timer
         if guess.lower() == self.countries[self.rounds_played - 1].lower():
